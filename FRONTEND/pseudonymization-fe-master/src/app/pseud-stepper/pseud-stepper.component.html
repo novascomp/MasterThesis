@@ -1,0 +1,68 @@
+<mat-horizontal-stepper [linear]="isLinear" #stepper>
+  <mat-step [stepControl]="colsFormGroup">
+    <form [formGroup]="colsFormGroup">
+      <div fxLayout="column" fxFlex.xs="grow"
+           fxFlex.sm="grow"
+           fxFlex.md="grow"
+           fxFlex="50">
+        <ng-template matStepLabel><span class="mat-headline">Vyberte sloupce</span></ng-template>
+        <mat-form-field fxFlex="100" appearance="fill">
+          <mat-label>Seznam sloupců</mat-label>
+          <mat-chip-grid class="cols-height" #chipGrid aria-label="Enter fruits">
+            <mat-chip-row *ngFor="let col of cols"
+                          (removed)="remove(col)"
+                          [editable]="true"
+                          (edited)="edit(col, $event)"
+                          [aria-description]="'press enter to edit ' + col.name">
+              {{col.name}}
+              <button matChipRemove [attr.aria-label]="'remove ' + col.name">
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </mat-chip-row>
+            <input placeholder="Zadejte sloupec ..."
+                   [matChipInputFor]="chipGrid"
+                   [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                   [matChipInputAddOnBlur]="addOnBlur"
+                   (matChipInputTokenEnd)="add($event)"/>
+          </mat-chip-grid>
+        </mat-form-field>
+        <div fxFlex="grow">&nbsp;</div>
+        <button class="submitButton" matStepperNext>Dálé
+        </button>
+      </div>
+    </form>
+  </mat-step>
+  <mat-step [stepControl]="methodForm">
+    <ng-template matStepLabel><span class="mat-headline">Vyberte metodu</span></ng-template>
+    <form [formGroup]="methodForm">
+      <div fxLayout="column" fxFlex.xs="grow"
+           fxFlex.sm="grow"
+           fxFlex.md="grow"
+           fxFlex="50">
+        <mat-radio-group [required] (change)="setTechnology($event)" fxFlex="grow">
+          <mat-radio-button value="scala_spark_cxi_none">Scala & Spark & CXI</mat-radio-button>
+          <mat-radio-button value="scala_spark_pkcs11_none">Scala & Spark & PKCS #11</mat-radio-button>
+          <mat-radio-button value="scala_spark_jce_none">Scala & Spark & JCE</mat-radio-button>
+          <mat-radio-button value="python_spark_pkcs11_udf">Python & Spark & PKCS #11 & udf</mat-radio-button>
+          <mat-radio-button value="python_spark_pkcs11_collect">Python & Spark & PKCS #11 & collect</mat-radio-button>
+          <mat-radio-button value="python_spark_redis_udf">Python & Spark & Redis & udf</mat-radio-button>
+          <mat-radio-button value="python_spark_redis_collect">Python & Spark & Redis & collect</mat-radio-button>
+          <mat-radio-button value="python_pandas_pkcs11_none">Python & Pandas & PKCS #11</mat-radio-button>
+        </mat-radio-group>
+        <mat-radio-group [required] (change)="setPseudOperation($event)" fxFlex="grow">
+          <mat-radio-button value="pseud">Pseudonymizovat</mat-radio-button>
+          <mat-radio-button value="de_pseud">De-Pseudonymizovat</mat-radio-button>
+        </mat-radio-group>
+        <button class="submitButton" matStepperPrevious>Návrat</button>
+        <div fxFlex="grow">&nbsp;</div>
+        <button class="submitButton" (click)="this.submit()" matStepperNext>Provést operaci
+        </button>
+      </div>
+    </form>
+  </mat-step>
+</mat-horizontal-stepper>
+<br>
+<mat-card *ngIf="invalidForm"
+          class="red-color">{{getBadRequestText()}}</mat-card>
+<mat-card *ngIf="getErrorText() != null"
+          class="red-color">{{getErrorText()}}</mat-card>

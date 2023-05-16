@@ -1,0 +1,80 @@
+@startuml
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+' uncomment the following line and comment the first to use locally
+' !include C4_Component.puml
+!include DEVICONS/angular.puml
+!include DEVICONS/java.puml
+!include FONTAWESOME/server.puml
+
+Person(user, "User")
+System_Boundary(c1, "Testing Docker Environment / Application") {
+
+    Container(frontend, "FRONTEND", "Angular", $sprite="angular")
+    Container(datgen, "DATA GENERATOR", "Python - Flask", $sprite="server")
+    Container(fileService, "FILE SERVICE", "Java - SpringBoot", $sprite="java")
+
+    Container(backend, "BACKEND", "Python - Flask", $sprite="server"){
+        Boundary(integrated, "INTEGRATED MODULES") {
+             Component(pandas_pkcs11, "python_pandas_pkcs11", "py script")
+             Component(python_spark_pkcs11_collect, "python_spark_(PKCS #11 or REDIS)_collect", "py script")
+             Component(pandas_pkcs11, "python_pandas_pkcs11", "py script")
+         }
+    }
+
+    ContainerDb(fileServiceDB, "FileService Database", "PostgreSQL", "")
+    ContainerDb(owncloudDB, "ownCloud", "ownCloud", "")
+    ContainerDb(mariab, "MariaDB", "MariaDB", "")
+    ContainerDb(redis, "Redis", "Redis", "")
+
+    Boundary(standalone, "STANDALONE MODULES") {
+        Component(python_spark_pkcs11_redis_udf, "python_spark_(PKCS #11 or REDIS)_udf", "py script")
+        Component(scala_spark_cxi_udf, "scala_spark_(CXI or JCE or PKCS #11)_udf", "jar")
+    }
+
+    Boundary(spark, "Spark and HDFS Cluster") {
+    }
+
+    Boundary(hsm, "Hardware Security Module") {
+        Component(pkcs11, "PKCS#11", "Cryptography api")
+        Component(cxi, "CXI", "Cryptography api")
+        Component(jce, "JCE", "Cryptography api")
+    }
+
+    Boundary(spark_redis, "Redis For Modules") {
+    }
+}
+
+
+Rel(user, frontend, "Uses", "https")
+Rel(fileService, fileServiceDB,"Stores data","")
+Rel(fileService, owncloudDB,"Stores data","")
+
+Rel(frontend, datgen,"Consuming API","")
+Rel(frontend, fileService,"Consuming API","")
+Rel(datgen, fileService,"Consuming API","")
+Rel(frontend, backend,"Consuming API","")
+Rel(backend, fileService,"Consuming API","")
+Rel(backend, standalone, "Executes", "spark-submit")
+
+Rel(owncloudDB, mariab,"Stores data","")
+Rel(owncloudDB, redis,"Stores data","")
+
+Rel(python_spark_pkcs11_collect, spark,"Depends on","")
+Rel(python_spark_pkcs11_redis_udf, spark,"Depends on","")
+Rel(scala_spark_cxi_udf, spark,"Depends on","")
+
+Rel(python_spark_pkcs11_collect, spark_redis,"Depends on","")
+Rel(python_spark_pkcs11_redis_udf, spark_redis,"Depends on","")
+
+Rel(pandas_pkcs11, pkcs11, "Depends on")
+Rel(python_spark_pkcs11_collect, pkcs11, "Depends on")
+Rel(python_spark_pkcs11_redis_udf, pkcs11,"Depends on","")
+
+Rel(scala_spark_cxi_udf, cxi, "Depends on")
+Rel(scala_spark_cxi_udf, jce, "Depends on")
+Rel(scala_spark_cxi_udf, pkcs11, "Depends on")
+
+@enduml

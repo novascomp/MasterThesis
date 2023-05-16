@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: nvf
+  datasource:
+    url: jdbc:postgresql://postgres2:5401/nvf_db
+    port: 5401
+    driverClassName: org.postgresql.Driver
+    username: root
+    password: root
+    hikari:
+      maximumPoolSize: 50
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+    defer-datasource-initialization: true
+    hibernate.ddl-auto: update
+    hibernate.default_schema: public
+  servlet:
+    multipart:
+      max-file-size: 1000MB
+      max-request-size: 1000MB
+
+server:
+  port: 51296
+#eureka:
+#  healthcheck:
+#    enabled: true
+#  client:
+#    serviceUrl:
+#      defaultZone: ${EUREKA_URI:http://discovery-service:8761/eureka}
+#  instance:
+#    preferIpAddress: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+    enabled-by-default: true
+  endpoint:
+    info:
+      enabled: true
+
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+    url: /openapi.yaml

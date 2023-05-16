@@ -1,0 +1,36 @@
+<div class="general-container-for-pages"
+     fxFlex="100"
+     fxLayout="row wrap"
+     fxLayoutAlign="start start">
+  <mat-tab-group [selectedIndex]="currentTabIndex" fxFlex="grow" fxLayout="column">
+    <mat-tab label="Pseudonymizační moduly">
+      <div class="mat-elevation-z6 general-item general-background"
+           fxFlex.xs="grow"
+           fxFlex.sm="grow"
+           fxFlex.md="grow"
+           fxLayout.xs="column"
+           fxLayout.sm="column"
+           fxLayout.md="column"
+           fxLayout="column" fxLayoutAlign="start stretch">
+        <app-pkcs11-table [initComponent]="1" (afterDone)="pseudEmitted($event)"></app-pkcs11-table>
+      </div>
+    </mat-tab>
+    <mat-tab label="Generování dat">
+      <div class="mat-elevation-z6 general-item general-background"
+           fxFlex="50"
+           fxFlex.xs="grow"
+           fxFlex.sm="grow"
+           fxFlex.md="grow"
+           fxLayout.xs="column"
+           fxLayout.sm="column"
+           fxLayout.md="column"
+           fxLayout="column" fxLayoutAlign="start stretch">
+        <app-datgen-table [initComponent]="1" (afterDone)="pseudEmitted($event)"></app-datgen-table>
+      </div>
+    </mat-tab>
+    <mat-tab label="Pseudonymizační formulář" [disabled]="!this.pseudFormActivated">
+      <app-pseud-stepper *ngIf="this.pseudFormActivated == true" [initComponent]="this.fileSource"
+                         (afterDone)="pseudFormSubmitted($event)"></app-pseud-stepper>
+    </mat-tab>
+  </mat-tab-group>
+</div>

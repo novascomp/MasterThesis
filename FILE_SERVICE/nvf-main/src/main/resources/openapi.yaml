@@ -1,0 +1,164 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Swagger NVF
+  license:
+    name: MIT
+paths:
+  /xfiles/{fileId}:
+    get:
+      summary: Get file by ID
+      operationId: getFileById
+      tags:
+        - files
+      parameters:
+        - in: path
+          name: fileId
+          schema:
+            type: string
+          required: true
+          description: ID of the file to get
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileX'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/Default'
+    delete:
+      summary: Delete file by ID
+      operationId: deleteFileById
+      tags:
+        - files
+      parameters:
+        - in: path
+          name: fileId
+          schema:
+            type: string
+          required: true
+          description: ID of the file to delete
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/Default'
+
+  /xfiles:
+    get:
+      summary: List all files
+      operationId: listAllFiles
+      tags:
+        - files
+      responses:
+        '200':
+          description: An array of files
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Files"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      summary: Upload file
+      operationId: uploadFile
+      tags:
+        - files
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          $ref: '#/components/responses/Created'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        default:
+          $ref: '#/components/responses/Default'
+
+components:
+  schemas:
+    FileX:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        link:
+          type: string
+    Files:
+      type: array
+      items:
+        $ref: "#/components/schemas/FileX"
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+
+  responses:
+    Created:
+      description: The specified resource has been created
+      content:
+        text/plain:
+          schema:
+            type: string
+    NoContent:
+      description: The specified resource has been updated
+      content:
+        text/plain:
+          schema:
+            type: string
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: The specified resource exists
+      content:
+        text/plain:
+          schema:
+            type: string
+    Default:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
